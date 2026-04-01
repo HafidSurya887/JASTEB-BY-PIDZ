@@ -4,97 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JASTEB BY PIDZ</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode_js@1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; text-align: center; padding: 20px; }
-        .container { max-width: 400px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        h1 { color: #00ff88; margin-bottom: 5px; }
-        p { font-size: 0.9em; color: #aaa; }
-        .item-list { margin-top: 20px; }
-        .bar { background: #252525; margin: 10px 0; padding: 15px; border-radius: 10px; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
-        .bar:hover { border-color: #00ff88; background: #2d2d2d; }
-        .bar span { display: block; font-weight: bold; }
-        .bar .sub { font-size: 0.8em; color: #00ff88; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: #0a0a0f; 
+            color: #e0e0e0; 
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            overflow-x: hidden;
+        }
+        .card { 
+            width: 100%; max-width: 450px; 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(15px);
+            padding: 30px; border-radius: 25px; 
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            text-align: center;
+        }
+        h1 { font-family: 'Orbitron', sans-serif; color: #00ff88; text-shadow: 0 0 10px #00ff8866; margin-bottom: 5px; }
+        .tagline { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-bottom: 30px; }
         
-        /* Modal Payment */
-        #payment-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
-        #qrcode { background: white; padding: 10px; border-radius: 10px; margin: 20px auto; }
-        .btn { background: #00ff88; color: black; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-cancel { background: #ff4444; color: white; margin-top: 10px; font-size: 0.8em; }
+        .bar { 
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 12px; padding: 15px 20px; border-radius: 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .bar:hover { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; transform: scale(1.02); }
+        .price { font-weight: 700; color: #fff; }
+        .ress { color: #00ff88; font-weight: 600; font-size: 0.8rem; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 5px; }
+
+        /* MODAL PAYMENT */
+        #payment-modal, #processing-screen { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #0a0a0f; justify-content: center; align-items: center; flex-direction: column; z-index: 1000;
+        }
+        .modal-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        
+        /* PROCESSING ANIMATION */
+        .loader {
+            border: 4px solid rgba(0, 255, 136, 0.1);
+            border-left-color: #00ff88;
+            width: 50px; height: 50px; border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn { 
+            background: #00ff88; color: #000; border: none; width: 80%; max-width: 250px;
+            padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-cancel { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="card">
     <h1>JASTEB BY PIDZ</h1>
-    <p> Ress Aman & Cepat</p>
+    <p class="tagline">PREMIUM RESULT • FAST PROCESS</p>
     
     <div class="item-list">
-        <div class="bar" onclick="bayar(5000, '50+ress')">
-            <span>Rp 5.000</span>
-            <span class="sub">50+ RESS</span>
+        <div class="bar" onclick="bayar(5000, '50+ RESS')">
+            <span class="price">Rp 5.000</span><span class="ress">50+ RESS</span>
         </div>
         <div class="bar" onclick="bayar(10000, '100+')">
-            <span>Rp 10.000</span>
-            <span class="sub">100+</span>
+            <span class="price">Rp 10.000</span><span class="ress">100+</span>
         </div>
         <div class="bar" onclick="bayar(15000, '150+')">
-            <span>Rp 15.000</span>
-            <span class="sub">150+</span>
+            <span class="price">Rp 15.000</span><span class="ress">150+</span>
         </div>
         <div class="bar" onclick="bayar(20000, '200+')">
-            <span>Rp 20.000</span>
-            <span class="sub">200+</span>
+            <span class="price">Rp 20.000</span><span class="ress">200+</span>
         </div>
         <div class="bar" onclick="bayar(25000, '250+')">
-            <span>Rp 25.000</span>
-            <span class="sub">250+</span>
+            <span class="price">Rp 25.000</span><span class="ress">250+</span>
         </div>
     </div>
 </div>
 
 <div id="payment-modal">
-    <h2 id="pay-title">Pembayaran</h2>
-    <div id="qrcode"></div>
-    <p>Silakan Scan QRIS di atas</p>
-    <button class="btn" onclick="selesai()">SELESAI</button>
-    <button class="btn btn-cancel" onclick="tutupModal()">Batal</button>
+    <h3 style="margin-bottom: 20px; font-family: 'Orbitron';">PEMBAYARAN QRIS</h3>
+    <div class="modal-box" id="qrcode-container">
+        <div id="qrcode"></div>
+    </div>
+    <p style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">Total Tagihan:</p>
+    <h2 id="pay-total" style="color: #00ff88; margin-bottom: 20px;"></h2>
+    <button class="btn" onclick="prosesKeWA()">KONFIRMASI SELESAI</button>
+    <button class="btn-cancel" onclick="tutupModal()">KEMBALI</button>
+</div>
+
+<div id="processing-screen">
+    <div class="loader"></div>
+    <h2 style="font-family: 'Orbitron'; color: #00ff88;">MENGKONFIRMASI...</h2>
+    <p style="color: #888; margin-top: 10px;">Mohon tunggu sebentar, permintaan Anda sedang diproses.</p>
 </div>
 
 <script>
-    // MASUKKAN STRING QRIS STATIS LO DI SINI
-    const qrisStatis = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
-    
-    const adminWA = "6288975532473"; // GANTI NO WA LO (Awali 62)
+    // DATA DARI USER
+    const qrisStatis = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403"; 
+    const adminWA = "6288975532473"; 
     let currentNominal = 0;
 
     function bayar(nominal, paket) {
         currentNominal = nominal;
-        document.getElementById('pay-title').innerText = "Total: Rp " + nominal.toLocaleString();
+        document.getElementById('pay-total').innerText = "Rp " + nominal.toLocaleString('id-ID');
         document.getElementById('payment-modal').style.display = 'flex';
         
-        // Generate QRIS Dinamis Sederhana (Hanya simulasi display untuk web jualan)
-        // Note: Logic CRC16 di JS butuh library tambahan, 
-        // untuk web jualan mending lgsg tampilin QRIS statis atau pakai API.
+        // Bersihkan QR lama & Generate Baru
         document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-            text: qrisStatis, // Untuk web jualan, nampilin QRIS statis paling aman
-            width: 200,
-            height: 200
-        });
+        setTimeout(() => {
+            new QRCode(document.getElementById("qrcode"), {
+                text: qrisStatis,
+                width: 200,
+                height: 200
+            });
+        }, 100);
     }
 
     function tutupModal() {
         document.getElementById('payment-modal').style.display = 'none';
     }
 
-    function selesai() {
-        const text = `DONE MIN BUY JASTEB\nNominal: ${currentNominal}\nEmail: Isi emailmu`;
-        const url = `https://wa.me/${adminWA}?text=${encodeURIComponent(text)}`;
-        window.location.href = url;
+    function prosesKeWA() {
+        // Sembunyikan modal bayar, tampilkan screen PROSES
+        document.getElementById('payment-modal').style.display = 'none';
+        document.getElementById('processing-screen').style.display = 'flex';
+
+        // Delay 3 detik biar kayak beneran lagi cek database
+        setTimeout(() => {
+            const text = `DONE MIN BUY JASTEB\nNominal: ${currentNominal}\nEmail: Isi emailmu`;
+            const url = `https://wa.me/${adminWA}?text=${encodeURIComponent(text)}`;
+            window.location.href = url;
+        }, 3000);
     }
 </script>
 
 </body>
 </html>
-
