@@ -3,125 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIDZ STORE - ALL IN ONE</title>
+    <title>FIDZ STORE - PREMIUM</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #00ff88; --bg: #0a0a0f; --text: #fff; --card: rgba(255,255,255,0.03); }
+        [data-theme="light"] { --bg: #f4f7f6; --text: #2d3436; --accent: #00b894; --card: #ffffff; }
+        [data-theme="purple"] { --bg: #1a0a2e; --text: #efccff; --accent: #bc13fe; --card: rgba(255,255,255,0.05); }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.5s; overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.5s; display: flex; justify-content: center; align-items: center; }
 
-        /* HEADER */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
-            background: rgba(10, 10, 15, 0.9); backdrop-filter: blur(10px);
-            display: none; justify-content: space-between; align-items: center;
-            padding: 0 20px; z-index: 2000; border-bottom: 1px solid rgba(0,255,136,0.1);
-        }
-        .logo-text { font-family: 'Orbitron'; color: var(--accent); font-size: 0.9rem; }
+        /* HEADER & THEME */
+        .theme-btn { position: fixed; top: 20px; left: 20px; z-index: 3000; background: var(--accent); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        header { position: fixed; top: 0; right: 0; padding: 15px 20px; display: none; align-items: center; z-index: 2000; }
         .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); cursor: pointer; }
 
-        /* AUTH SCREEN */
-        #auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; }
-        .auth-card { width: 100%; max-width: 380px; background: var(--card); padding: 40px 30px; border-radius: 30px; border: 1px solid var(--accent); text-align: center; }
-        h1 { font-family: 'Orbitron'; color: var(--accent); margin-bottom: 25px; font-size: 1.3rem; }
-        input { width: 100%; padding: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,136,0.2); border-radius: 10px; color: #fff; outline: none; }
+        /* CARDS */
+        #auth-screen, #main-store { width: 90%; max-width: 380px; animation: fadeInUp 0.5s; }
+        #main-store { display: none; }
+        .card { background: var(--card); padding: 30px; border-radius: 30px; border: 1px solid var(--accent); text-align: center; }
+        input { width: 100%; padding: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--accent); border-radius: 10px; color: var(--text); outline: none; }
+        
+        .item { background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s; }
+        .item:hover { background: rgba(0,255,136,0.1); transform: scale(1.02); }
+        .ress { background: var(--accent); color: #000; font-size: 10px; padding: 4px 10px; border-radius: 8px; font-weight: 800; }
 
-        /* STORE UI */
-        #main-store { display: none; width: 100%; max-width: 400px; margin: 90px auto 30px; padding: 0 20px; text-align: center; }
-        .store-card { background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid rgba(0,255,136,0.2); }
-        .item { 
-            background: rgba(255,255,255,0.05); margin-bottom: 12px; padding: 18px; 
-            border-radius: 15px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: 0.3s; border: 1px solid transparent;
-        }
-        .item:hover { border-color: var(--accent); background: rgba(0,255,136,0.1); transform: scale(1.02); }
-        .ress { background: var(--accent); color: #000; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; }
+        /* COMMUNITY BUTTONS */
+        .comm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-comm { padding: 12px; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 12px; font-family: 'Orbitron'; font-size: 9px; cursor: pointer; transition: 0.3s; }
+        .btn-comm:hover { background: var(--accent); color: #000; }
+        .branding { margin-top: 25px; font-family: 'Orbitron'; font-size: 9px; opacity: 0.4; letter-spacing: 1px; }
 
-        /* MODAL & LOADER */
-        #modal, #proc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); justify-content: center; align-items: center; flex-direction: column; z-index: 3000; }
-        .qr-box { background: #fff; padding: 10px; border-radius: 15px; width: 250px; height: 250px; margin: 20px 0; }
-        .btn-pro { background: var(--accent); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; font-family: 'Orbitron'; cursor: pointer; }
-        .loader { width: 50px; height: 50px; border: 5px solid rgba(0, 255, 136, 0.1); border-left-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* HELPER */
+        .helper-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 15px var(--accent); z-index: 5000; transition: 0.3s; border: none; }
+        .helper-btn span { color: #000; font-size: 20px; font-weight: 900; }
+
+        /* PAYMENT MODAL */
+        #modal, #proc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); justify-content: center; align-items: center; flex-direction: column; z-index: 4000; }
+        .qr-box { background: #fff; padding: 10px; border-radius: 15px; width: 250px; height: 250px; margin-bottom: 20px; }
+        .btn-pro { background: var(--accent); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Orbitron'; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body data-theme="dark">
+
+    <button class="theme-btn" onclick="gantiTema()">TEMA</button>
 
     <header id="main-header">
-        <div class="logo-text">FIDZ STORE</div>
-        <img id="user-avatar" src="https://api.dicebear.com/8.x/avataaars/svg?seed=Fidz" class="avatar" onclick="logout()">
+        <img src="https://api.dicebear.com/8.x/avataaars/svg?seed=Fidz" class="avatar" onclick="logout()">
     </header>
 
-    <div id="auth-container">
-        <div class="auth-card">
-            <h1 id="auth-title">DAFTAR AKUN</h1>
-            <input type="text" id="username" placeholder="Nama User">
-            <input type="password" id="password" placeholder="Password">
-            <div id="confirm-box"><input type="password" id="confirm-password" placeholder="Ulangi Password"></div>
-            <button class="btn-pro" style="width: 100%; border-radius: 12px;" onclick="handleAuth()" id="auth-btn">DAFTAR</button>
-            <p style="margin-top: 15px; font-size: 0.8rem; color: #888;">
-                <span id="toggle-text">Sudah punya akun?</span> <span onclick="switchMode()" style="color: var(--accent); cursor: pointer;">Klik Login</span>
-            </p>
-        </div>
+    <button class="helper-btn" id="helper" style="display:none;" onclick="contactAdmin()">
+        <span>?</span>
+    </button>
+
+    <div id="auth-screen" class="card">
+        <h1 id="auth-title">DAFTAR</h1>
+        <input type="text" id="user" placeholder="Nama User">
+        <input type="password" id="pass" placeholder="Password">
+        <div id="conf-box"><input type="password" id="conf" placeholder="Konfirmasi Password"></div>
+        <button class="btn-pro" style="width:100%" onclick="handleAuth()" id="auth-btn">DAFTAR</button>
+        <p style="font-size:10px; margin-top:15px; cursor:pointer" onclick="switchMode()" id="toggle">Sudah punya akun? Login</p>
     </div>
 
     <div id="main-store">
-        <div class="store-card">
-            <h2 style="font-family: 'Orbitron'; color: var(--accent); margin-bottom: 5px;">SELAMAT DATANG!</h2>
-            <p id="welcome-msg" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 25px;"></p>
-            <div id="price-list"></div>
+        <div class="card">
+            <h1 style="font-size: 1.2rem; margin-bottom: 5px;">FIDZ STORE</h1>
+            <p id="greet" style="font-size: 10px; opacity: 0.6; margin-bottom: 25px;"></p>
+            
+            <div id="list-paket"></div>
+
+            <div class="comm-grid">
+                <button class="btn-comm" onclick="window.open('https://whatsapp.com/channel/0029VbCZzxqCBtxNoi04ru35')">SALURAN PIDZ</button>
+                <button class="btn-comm" onclick="window.open('https://chat.whatsapp.com/HbX95imTKFp4zd6ypoU3iK')">GRUP PIDZ</button>
+            </div>
+            
+            <div class="branding">CREATE WEB P BY PIDZ</div>
         </div>
     </div>
 
     <div id="modal">
-        <h2 id="m-price" style="font-family: 'Orbitron'; color: var(--accent);"></h2>
-        <div class="qr-box"><img id="qr-img" src="" style="width: 100%;"></div>
+        <h2 id="m-price" style="font-family:'Orbitron'; color:var(--accent); margin-bottom:15px;"></h2>
+        <div class="qr-box"><img id="qr-img" style="width:100%"></div>
         <button class="btn-pro" onclick="kirimWA()">SUDAH TRANSFER</button>
-        <p onclick="closeModal()" style="margin-top: 20px; cursor: pointer; opacity: 0.5;">Kembali</p>
+        <p onclick="closeModal()" style="margin-top:15px; cursor:pointer; opacity:0.5;">Batal</p>
     </div>
 
     <div id="proc">
-        <div class="loader"></div>
-        <h3 id="status" style="font-family: 'Orbitron'; color: var(--accent);">MENGECEK DANA...</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--accent);">SISTEM MENGECEK...</h3>
     </div>
 
 <script>
-    const qrisBase = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
+    const qris = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
     const wa = "6288975532473";
     const paket = [5000, 10000, 15000, 20000, 25000];
     let isLogin = false, currentH = 0;
 
+    const themes = ["dark", "light", "purple"];
+    let thIdx = 0;
+    function gantiTema() {
+        thIdx = (thIdx + 1) % themes.length;
+        document.body.setAttribute('data-theme', themes[thIdx]);
+    }
+
     function switchMode() {
         isLogin = !isLogin;
-        document.getElementById('auth-title').innerText = isLogin ? "LOGIN STORE" : "DAFTAR AKUN";
-        document.getElementById('auth-btn').innerText = isLogin ? "LOGIN" : "DAFTAR";
-        document.getElementById('confirm-box').style.display = isLogin ? "none" : "block";
-        document.getElementById('toggle-text').innerText = isLogin ? "Belum punya akun?" : "Sudah punya akun?";
+        document.getElementById('auth-title').innerText = isLogin ? "LOGIN" : "DAFTAR";
+        document.getElementById('conf-box').style.display = isLogin ? "none" : "block";
+        document.getElementById('toggle').innerText = isLogin ? "Belum punya akun? Daftar" : "Sudah punya akun? Login";
     }
 
     function handleAuth() {
-        const u = document.getElementById('username').value, p = document.getElementById('password').value, c = document.getElementById('confirm-password').value;
-        if (!u || !p) return alert("Isi data!");
-        if (!isLogin) {
-            if (p !== c) return alert("Password Gak Cocok!");
-            localStorage.setItem('fidz_u', u); localStorage.setItem('fidz_p', p);
-            alert("Berhasil Daftar! Silakan Login."); switchMode();
+        const u = document.getElementById('user').value, p = document.getElementById('pass').value, c = document.getElementById('conf').value;
+        if(!isLogin) {
+            if(p !== c) return alert("Password tidak cocok!");
+            localStorage.setItem('f_u', u); localStorage.setItem('f_p', p);
+            alert("Berhasil! Silakan Login."); switchMode();
         } else {
-            if (u === localStorage.getItem('fidz_u') && p === localStorage.getItem('fidz_p')) showStore(u);
-            else alert("Salah Password!");
+            if(u === localStorage.getItem('f_u') && p === localStorage.getItem('f_p')) {
+                localStorage.setItem('f_session', u); showStore(u);
+            } else { alert("Data salah!"); }
         }
     }
 
-    function showStore(name) {
-        document.getElementById('auth-container').style.display = 'none';
+    function showStore(n) {
+        document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-store').style.display = 'block';
-        document.getElementById('welcome-msg').innerText = "Halo " + name + ", pilih paket JASTEB lo:";
-        renderList();
+        document.getElementById('helper').style.display = 'flex';
+        document.getElementById('greet').innerText = "Halo " + n + ", JUBEL HASIL RESS AKTIF";
+        render();
     }
 
-    function renderList() {
-        document.getElementById('price-list').innerHTML = paket.map(h => `
+    // AUTO-LOGIN SESSION
+    window.onload = () => {
+        const s = localStorage.getItem('f_session');
+        if(s) showStore(s);
+    };
+
+    function render() {
+        document.getElementById('list-paket').innerHTML = paket.map(h => `
             <div class="item" onclick="openPay(${h})">
                 <span style="font-weight:700">Rp ${h.toLocaleString('id-ID')}</span>
                 <span class="ress">${h/100} RESS</span>
@@ -132,34 +153,23 @@
     function openPay(n) {
         currentH = n;
         document.getElementById('m-price').innerText = "Rp " + n.toLocaleString('id-ID');
-        let q = qrisBase.slice(0, -4);
+        let q = qris.slice(0, -4);
         let tag = "54" + n.toString().length.toString().padStart(2, '0') + n;
         let final = q.replace("5802ID", tag + "5802ID");
-        
-        // CRC16
         let crc = 0xFFFF;
         for (let i = 0; i < final.length; i++) {
             crc ^= final.charCodeAt(i) << 8;
             for (let j = 0; j < 8; j++) crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
         }
         final += (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-        
         document.getElementById('qr-img').src = `https://quickchart.io/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(final)}`;
         document.getElementById('modal').style.display = 'flex';
     }
 
+    function contactAdmin() { window.location.href = `https://wa.me/${wa}?text=Min, butuh bantuan di Fidz Store!`; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-    function kirimWA() {
-        document.getElementById('modal').style.display = 'none';
-        document.getElementById('proc').style.display = 'flex';
-        setTimeout(() => document.getElementById('status').innerText = "MENYIAPKAN RESS...", 1500);
-        setTimeout(() => {
-            window.location.href = `https://wa.me/${wa}?text=Done JASTEB Rp ${currentH}`;
-        }, 3000);
-    }
-
-    function logout() { if(confirm("Logout?")) location.reload(); }
+    function logout() { localStorage.removeItem('f_session'); location.reload(); }
+    function kirimWA() { window.location.href = `https://wa.me/${wa}?text=Done Bayar Rp ${currentH}. Proses Min!`; }
 </script>
 </body>
 </html>
