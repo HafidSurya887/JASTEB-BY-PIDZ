@@ -3,159 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JASTEB BY PIDZ</title>
+    <title>FIDZ STORE - MULTI THEME</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00ff88; --bg: #0a0a0f; }
+        /* PENGATURAN VARIABEL TEMA */
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --text: #ffffff;
+            --accent: #00ff88;
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        /* TEMA LIGHT */
+        [data-theme="light"] {
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --accent: #00b894;
+            --input-bg: #dfe6e9;
+        }
+
+        /* TEMA PURPLE */
+        [data-theme="purple"] {
+            --bg: #1a0a2e;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #efccff;
+            --accent: #bc13fe;
+            --input-bg: rgba(188, 19, 254, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.5s; display: flex; justify-content: center; align-items: center; }
+
+        /* TOMBOL UBAH TEMA */
+        .theme-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: var(--accent); color: #000; border: none;
+            padding: 8px 12px; border-radius: 8px; font-family: 'Orbitron';
+            font-size: 10px; cursor: pointer; box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* LAYAR LOGIN */
+        #login-screen {
+            width: 90%; max-width: 350px; text-align: center; padding: 40px;
+            background: var(--card-bg); border-radius: 30px;
+            border: 1px solid var(--accent); backdrop-filter: blur(10px);
+        }
+        input {
+            width: 100%; padding: 15px; margin-bottom: 15px; background: var(--input-bg);
+            border: 1px solid var(--accent); border-radius: 12px; color: var(--text); outline: none;
+        }
+
+        /* CARD UTAMA */
+        #main-store { display: none; width: 95%; max-width: 400px; animation: fadeInUp 0.5s; }
+        .card { background: var(--card-bg); padding: 30px; border-radius: 30px; border: 1px solid var(--accent); text-align: center; }
         
-        .card { 
-            width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); padding: 30px; border-radius: 30px; 
-            border: 1px solid rgba(0, 255, 136, 0.2); text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
-        }
-
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); margin-bottom: 5px; }
-        .tagline { font-size: 0.65rem; letter-spacing: 3px; color: #888; margin-bottom: 25px; text-transform: uppercase; }
-
         .item { 
-            background: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 18px; 
-            border-radius: 15px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: 0.4s; border: 1px solid transparent;
+            background: var(--input-bg); margin-bottom: 12px; padding: 18px; 
+            border-radius: 15px; display: flex; justify-content: space-between; 
+            cursor: pointer; transition: 0.3s; border: 1px solid transparent; 
         }
-        .item:hover { 
-            background: rgba(0, 255, 136, 0.1); border-color: var(--neon); 
-            transform: translateY(-3px) scale(1.02); box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
-        }
-        .price { font-weight: 700; font-size: 1.1rem; }
-        .ress { background: var(--neon); color: #000; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; }
+        .item:hover { border-color: var(--accent); transform: scale(1.02); }
+        .ress { background: var(--accent); color: #000; font-size: 10px; padding: 4px 10px; border-radius: 8px; font-weight: 800; }
 
-        #modal { 
+        /* MODAL & PROCESSING */
+        #modal, #processing-screen { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(10, 10, 15, 0.98); justify-content: center; align-items: center; 
-            flex-direction: column; z-index: 999; animation: fadeIn 0.3s;
+            background: var(--bg); justify-content: center; align-items: center; flex-direction: column; z-index: 1000; 
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .qr-container { 
-            background: #fff; padding: 15px; border-radius: 20px; 
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3); margin-bottom: 20px;
-            width: 260px; height: 260px; display: flex; justify-content: center; align-items: center;
-        }
-        .qr-container img { width: 100%; height: 100%; display: block; }
-
-        .info-pay { text-align: center; margin-bottom: 20px; }
-        .info-pay p { color: #888; font-size: 0.8rem; }
-        .info-pay h2 { color: var(--neon); font-family: 'Orbitron'; font-size: 1.8rem; }
-
-        .copy-box { 
-            background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 10px;
-            font-size: 0.8rem; border: 1px dashed var(--neon); margin-bottom: 20px; cursor: pointer;
+        .qr-box { background: #fff; padding: 10px; border-radius: 15px; margin: 20px 0; width: 250px; height: 250px; }
+        .qr-box img { width: 100%; }
+        
+        .btn-pro { 
+            background: var(--accent); color: #000; border: none; padding: 15px 40px; 
+            border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Orbitron';
         }
 
-        .btn-done { 
-            background: var(--neon); color: #000; border: none; width: 200px; padding: 15px; 
-            border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4); transition: 0.3s;
+        .loader {
+            width: 50px; height: 50px; border: 5px solid var(--input-bg);
+            border-left-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
-        .btn-done:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--neon); }
-        .btn-back { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
-<div class="card">
-    <h1>PIDZ STORE</h1>
-    <p class="tagline">JUBEL HASIL RESS • PREMIUM</p>
-    
-    <div id="price-list"></div>
-    
-    <p style="margin-top: 20px; font-size: 0.6rem; color: #555;">PROSES OTOMATIS VIA WHATSAPP</p>
-</div>
+    <button class="theme-btn" onclick="gantiTema()">GANTI TEMA</button>
 
-<div id="modal">
-    <div class="info-pay">
-        <p>TOTAL PEMBAYARAN</p>
-        <h2 id="display-price"></h2>
+    <div id="login-screen">
+        <h1 style="font-family: 'Orbitron'; margin-bottom: 20px;">FIDZ AUTH</h1>
+        <input type="password" id="pass" placeholder="Password (123)">
+        <button class="btn-pro" style="width: 100%;" onclick="cekLogin()">Masuk</button>
     </div>
 
-    <div class="qr-container">
-        <img id="qr-img" src="" alt="QRIS OTOMATIS">
+    <div id="main-store">
+        <div class="card">
+            <h1 style="font-family: 'Orbitron'; margin-bottom: 5px; color: var(--accent);">PIDZ STORE</h1>
+            <p style="font-size: 10px; color: var(--text); opacity: 0.6; margin-bottom: 25px;">PREMIUM JUBEL HASIL RESS</p>
+            <div id="price-list"></div>
+        </div>
     </div>
 
-    <div class="copy-box" onclick="copyNominal()">
-        Klik untuk Salin Nominal: <b id="copy-val"></b>
+    <div id="modal">
+        <h2 id="m-price" style="font-family: 'Orbitron'; color: var(--accent);"></h2>
+        <div class="qr-box"><img id="qr-img" src="" alt="QRIS"></div>
+        <button class="btn-pro" onclick="kirimWA()">SUDAH TRANSFER</button>
+        <p onclick="closeModal()" style="margin-top: 15px; cursor: pointer; opacity: 0.5;">Batal</p>
     </div>
 
-    <button class="btn-done" onclick="kirimWA()">SUDAH TRANSFER</button>
-    <button class="btn-back" onclick="closeModal()">KEMBALI</button>
-</div>
+    <div id="processing-screen">
+        <div class="loader"></div>
+        <h3 id="status" style="font-family: 'Orbitron'; color: var(--accent);">MENGECEK...</h3>
+    </div>
 
 <script>
-    // DATA QRIS ASLI LO (YG SUDAH DIBERSIHKAN CRC-NYA)
     const qrisBase = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
-    const waNumber = "6288975532473";
-    const paket = [
-        {h: 5000, r: "50+ RESS"},
-        {h: 10000, r: "100+ RESS"},
-        {h: 15000, r: "150+ RESS"},
-        {h: 20000, r: "200+ RESS"},
-        {h: 25000, r: "250+ RESS"}
-    ];
+    const wa = "6288975532473";
+    const paket = [5000, 10000, 15000, 20000, 25000];
+    let hrg = 0;
 
-    let currentPrice = 0;
+    // LOGIC TEMA
+    const themes = ["dark", "light", "purple"];
+    let currentThemeIdx = 0;
+    function gantiTema() {
+        currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+        document.body.setAttribute('data-theme', themes[currentThemeIdx]);
+    }
 
-    // FUNGSI HITUNG CRC16 BIAR QRIS GAK RUSAK PAS DISUNTIK HARGA
-    function getCRC16(data) {
+    function cekLogin() {
+        if(document.getElementById('pass').value === "123") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-store').style.display = 'block';
+            render();
+        } else { alert("Salah!"); }
+    }
+
+    function render() {
+        document.getElementById('price-list').innerHTML = paket.map(p => `
+            <div class="item" onclick="openPay(${p})">
+                <span style="font-weight:700">Rp ${p.toLocaleString('id-ID')}</span>
+                <span class="ress">${p/100} RESS</span>
+            </div>
+        `).join('');
+    }
+
+    function openPay(n) {
+        hrg = n;
+        document.getElementById('m-price').innerText = "Rp " + n.toLocaleString('id-ID');
+        let q = qrisBase.slice(0, -4);
+        let tag = "54" + n.toString().length.toString().padStart(2, '0') + n;
+        let final = q.replace("5802ID", tag + "5802ID");
+        
+        // CRC Calculation (Sederhana)
         let crc = 0xFFFF;
-        for (let i = 0; i < data.length; i++) {
-            crc ^= data.charCodeAt(i) << 8;
+        for (let i = 0; i < final.length; i++) {
+            crc ^= final.charCodeAt(i) << 8;
             for (let j = 0; j < 8; j++) {
                 if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
                 else crc = (crc << 1);
             }
         }
-        return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-    }
-
-    // GENERATE LINK QR OTOMATIS
-    function generateQR(amount) {
-        let q = qrisBase.slice(0, -4);
-        let step1 = q.replace("5802ID", "54" + amount.toString().length.toString().padStart(2, '0') + amount + "5802ID");
-        let finalQR = step1 + getCRC16(step1);
+        final += (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
         
-        // Pake API QuickChart (Lebih pro & stabil dibanding Google)
-        return `https://quickchart.io/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(finalQR)}`;
-    }
-
-    // RENDER LIST HARGA
-    document.getElementById('price-list').innerHTML = paket.map(p => `
-        <div class="item" onclick="openModal(${p.h})">
-            <span class="price">Rp ${p.h.toLocaleString('id-ID')}</span>
-            <span class="ress">${p.r}</span>
-        </div>
-    `).join('');
-
-    function openModal(n) {
-        currentPrice = n;
-        document.getElementById('display-price').innerText = "Rp " + n.toLocaleString('id-ID');
-        document.getElementById('copy-val').innerText = n;
-        document.getElementById('qr-img').src = generateQR(n);
+        document.getElementById('qr-img').src = `https://quickchart.io/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(final)}`;
         document.getElementById('modal').style.display = 'flex';
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    function copyNominal() {
-        navigator.clipboard.writeText(currentPrice);
-        alert("Nominal " + currentPrice + " berhasil disalin!");
-    }
-
     function kirimWA() {
-        const text = `Halo Min, Saya sudah bayar JASTEB.\nNominal: Rp ${currentPrice.toLocaleString('id-ID')}\nMohon diproses ya!`;
-        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('processing-screen').style.display = 'flex';
+        const st = document.getElementById('status');
+        setTimeout(() => st.innerText = "VERIFIKASI SALDO...", 1000);
+        setTimeout(() => st.innerText = "MENYIAPKAN DATA...", 2000);
+        setTimeout(() => {
+            window.location.href = `https://wa.me/${wa}?text=Done Bayar Rp ${hrg}`;
+        }, 3500);
     }
 </script>
 </body>
