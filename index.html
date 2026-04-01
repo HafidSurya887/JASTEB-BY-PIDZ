@@ -6,66 +6,156 @@
     <title>JASTEB BY PIDZ</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root { --neon: #00ff88; --bg: #0a0a0f; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .card { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center; }
-        h1 { font-family: 'Orbitron', sans-serif; color: #00ff88; text-shadow: 0 0 10px #00ff8866; margin-bottom: 5px; }
-        .tagline { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-bottom: 30px; }
-        .bar { background: rgba(255, 255, 255, 0.03); margin-bottom: 12px; padding: 15px 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .bar:hover { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; transform: scale(1.02); }
-        .price { font-weight: 700; color: #fff; }
-        .ress { color: #00ff88; font-weight: 600; font-size: 0.8rem; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 5px; }
-        #payment-modal, #processing-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; justify-content: center; align-items: center; flex-direction: column; z-index: 1000; padding: 20px; }
-        .modal-box { background: #fff; padding: 10px; border-radius: 15px; margin-bottom: 20px; width: 280px; height: 280px; overflow: hidden; }
-        .modal-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .loader { border: 4px solid rgba(0, 255, 136, 0.1); border-left-color: #00ff88; width: 50px; height: 50px; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .btn { background: #00ff88; color: #000; border: none; width: 100%; max-width: 250px; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-cancel { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        
+        .card { 
+            width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); padding: 30px; border-radius: 30px; 
+            border: 1px solid rgba(0, 255, 136, 0.2); text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
+        }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon); text-shadow: 0 0 15px var(--neon); margin-bottom: 5px; }
+        .tagline { font-size: 0.65rem; letter-spacing: 3px; color: #888; margin-bottom: 25px; text-transform: uppercase; }
+
+        .item { 
+            background: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 18px; 
+            border-radius: 15px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: 0.4s; border: 1px solid transparent;
+        }
+        .item:hover { 
+            background: rgba(0, 255, 136, 0.1); border-color: var(--neon); 
+            transform: translateY(-3px) scale(1.02); box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+        }
+        .price { font-weight: 700; font-size: 1.1rem; }
+        .ress { background: var(--neon); color: #000; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; }
+
+        #modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(10, 10, 15, 0.98); justify-content: center; align-items: center; 
+            flex-direction: column; z-index: 999; animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .qr-container { 
+            background: #fff; padding: 15px; border-radius: 20px; 
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3); margin-bottom: 20px;
+            width: 260px; height: 260px; display: flex; justify-content: center; align-items: center;
+        }
+        .qr-container img { width: 100%; height: 100%; display: block; }
+
+        .info-pay { text-align: center; margin-bottom: 20px; }
+        .info-pay p { color: #888; font-size: 0.8rem; }
+        .info-pay h2 { color: var(--neon); font-family: 'Orbitron'; font-size: 1.8rem; }
+
+        .copy-box { 
+            background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 10px;
+            font-size: 0.8rem; border: 1px dashed var(--neon); margin-bottom: 20px; cursor: pointer;
+        }
+
+        .btn-done { 
+            background: var(--neon); color: #000; border: none; width: 200px; padding: 15px; 
+            border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4); transition: 0.3s;
+        }
+        .btn-done:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--neon); }
+        .btn-back { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>JASTEB BY PIDZ</h1>
-    <p class="tagline">JUBEL HASIL RESS • PIDZ STORE</p>
-    <div class="bar" onclick="buka(5000)"> <span class="price">Rp 5.000</span> <span class="ress">50+ RESS</span> </div>
-    <div class="bar" onclick="buka(10000)"> <span class="price">Rp 10.000</span> <span class="ress">100+</span> </div>
-    <div class="bar" onclick="buka(15000)"> <span class="price">Rp 15.000</span> <span class="ress">150+</span> </div>
-    <div class="bar" onclick="buka(20000)"> <span class="price">Rp 20.000</span> <span class="ress">200+</span> </div>
-    <div class="bar" onclick="buka(25000)"> <span class="price">Rp 25.000</span> <span class="ress">250+</span> </div>
+    <h1>PIDZ STORE</h1>
+    <p class="tagline">JUBEL HASIL RESS • PREMIUM</p>
+    
+    <div id="price-list"></div>
+    
+    <p style="margin-top: 20px; font-size: 0.6rem; color: #555;">PROSES OTOMATIS VIA WHATSAPP</p>
 </div>
 
-<div id="payment-modal">
-    <h3 style="margin-bottom: 20px; font-family: 'Orbitron';">SILAHKAN SCAN</h3>
-    <div class="modal-box">
-        <img src="bayar.jpg" alt="QRIS">
+<div id="modal">
+    <div class="info-pay">
+        <p>TOTAL PEMBAYARAN</p>
+        <h2 id="display-price"></h2>
     </div>
-    <p style="color: #888; font-size: 0.8rem;">Total Tagihan:</p>
-    <h2 id="txt-harga" style="color: #00ff88; margin-bottom: 20px;"></h2>
-    <button class="btn" onclick="keWA()">KONFIRMASI SELESAI</button>
-    <button class="btn-cancel" onclick="tutup()">KEMBALI</button>
-</div>
 
-<div id="processing-screen">
-    <div class="loader"></div>
-    <h2 style="font-family: 'Orbitron'; color: #00ff88;">MEMPROSES...</h2>
+    <div class="qr-container">
+        <img id="qr-img" src="" alt="QRIS OTOMATIS">
+    </div>
+
+    <div class="copy-box" onclick="copyNominal()">
+        Klik untuk Salin Nominal: <b id="copy-val"></b>
+    </div>
+
+    <button class="btn-done" onclick="kirimWA()">SUDAH TRANSFER</button>
+    <button class="btn-back" onclick="closeModal()">KEMBALI</button>
 </div>
 
 <script>
-    let hargaPilih = 0;
-    function buka(n) {
-        hargaPilih = n;
-        document.getElementById('txt-harga').innerText = "Rp " + n.toLocaleString('id-ID');
-        document.getElementById('payment-modal').style.display = 'flex';
+    // DATA QRIS ASLI LO (YG SUDAH DIBERSIHKAN CRC-NYA)
+    const qrisBase = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
+    const waNumber = "6288975532473";
+    const paket = [
+        {h: 5000, r: "50+ RESS"},
+        {h: 10000, r: "100+ RESS"},
+        {h: 15000, r: "150+ RESS"},
+        {h: 20000, r: "200+ RESS"},
+        {h: 25000, r: "250+ RESS"}
+    ];
+
+    let currentPrice = 0;
+
+    // FUNGSI HITUNG CRC16 BIAR QRIS GAK RUSAK PAS DISUNTIK HARGA
+    function getCRC16(data) {
+        let crc = 0xFFFF;
+        for (let i = 0; i < data.length; i++) {
+            crc ^= data.charCodeAt(i) << 8;
+            for (let j = 0; j < 8; j++) {
+                if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
+                else crc = (crc << 1);
+            }
+        }
+        return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
-    function tutup() { document.getElementById('payment-modal').style.display = 'none'; }
-    function keWA() {
-        document.getElementById('payment-modal').style.display = 'none';
-        document.getElementById('processing-screen').style.display = 'flex';
-        setTimeout(() => {
-            window.location.href = "https://wa.me/6288975532473?text=" + encodeURIComponent("DONE MIN BUY JASTEB\nNominal: " + hargaPilih);
-        }, 2000);
+
+    // GENERATE LINK QR OTOMATIS
+    function generateQR(amount) {
+        let q = qrisBase.slice(0, -4);
+        let step1 = q.replace("5802ID", "54" + amount.toString().length.toString().padStart(2, '0') + amount + "5802ID");
+        let finalQR = step1 + getCRC16(step1);
+        
+        // Pake API QuickChart (Lebih pro & stabil dibanding Google)
+        return `https://quickchart.io/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(finalQR)}`;
+    }
+
+    // RENDER LIST HARGA
+    document.getElementById('price-list').innerHTML = paket.map(p => `
+        <div class="item" onclick="openModal(${p.h})">
+            <span class="price">Rp ${p.h.toLocaleString('id-ID')}</span>
+            <span class="ress">${p.r}</span>
+        </div>
+    `).join('');
+
+    function openModal(n) {
+        currentPrice = n;
+        document.getElementById('display-price').innerText = "Rp " + n.toLocaleString('id-ID');
+        document.getElementById('copy-val').innerText = n;
+        document.getElementById('qr-img').src = generateQR(n);
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function copyNominal() {
+        navigator.clipboard.writeText(currentPrice);
+        alert("Nominal " + currentPrice + " berhasil disalin!");
+    }
+
+    function kirimWA() {
+        const text = `Halo Min, Saya sudah bayar JASTEB.\nNominal: Rp ${currentPrice.toLocaleString('id-ID')}\nMohon diproses ya!`;
+        window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
     }
 </script>
 </body>
