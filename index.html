@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JASTEB BY PIDZ</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .card { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center; box-shadow: 0 0 20px rgba(0, 255, 136, 0.1); }
+        .card { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center; }
         h1 { font-family: 'Orbitron', sans-serif; color: #00ff88; text-shadow: 0 0 10px #00ff8866; margin-bottom: 5px; }
         .tagline { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-bottom: 30px; }
         .bar { background: rgba(255, 255, 255, 0.03); margin-bottom: 12px; padding: 15px 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -16,8 +17,8 @@
         .price { font-weight: 700; color: #fff; }
         .ress { color: #00ff88; font-weight: 600; font-size: 0.8rem; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 5px; }
         #payment-modal, #processing-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; justify-content: center; align-items: center; flex-direction: column; z-index: 1000; }
-        .modal-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; width: 260px; height: 260px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-        .modal-box img { width: 100%; height: 100%; }
+        .modal-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+        #qrcode img { margin: 0 auto; display: block; }
         .loader { border: 4px solid rgba(0, 255, 136, 0.1); border-left-color: #00ff88; width: 50px; height: 50px; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .btn { background: #00ff88; color: #000; border: none; width: 80%; max-width: 250px; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
@@ -28,23 +29,21 @@
 
 <div class="card">
     <h1>JASTEB BY PIDZ</h1>
-    <p class="tagline">JUBEL HASIL RESS • AUTOMATIC QRIS</p>
-    <div class="item-list" id="list-target"></div>
+    <p class="tagline">JUBEL HASIL RESS • BY FIDZ STORE</p>
+    <div id="list-item"></div>
 </div>
 
 <div id="payment-modal">
     <h3 style="margin-bottom: 20px; font-family: 'Orbitron'; color: white;">PEMBAYARAN QRIS</h3>
-    <div class="modal-box"><img id="qris-image" src="" alt="QRIS"></div>
-    <p style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">Total Tagihan:</p>
+    <div class="modal-box"><div id="qrcode"></div></div>
     <h2 id="pay-total" style="color: #00ff88; margin-bottom: 20px;"></h2>
     <button class="btn" onclick="prosesKeWA()">KONFIRMASI SELESAI</button>
-    <button class="btn-cancel" onclick="tutupModal()">KEMBALI</button>
+    <button class="btn-cancel" onclick="tutupModal()">BATAL</button>
 </div>
 
 <div id="processing-screen">
     <div class="loader"></div>
     <h2 style="font-family: 'Orbitron'; color: #00ff88;">MENGKONFIRMASI...</h2>
-    <p style="color: #888; margin-top: 10px;">Cek mutasi otomatis sedang berjalan.</p>
 </div>
 
 <script>
@@ -53,52 +52,48 @@
     const paket = [5000, 10000, 15000, 20000, 25000];
     let selectedNominal = 0;
 
-    // FUNGSI SAKTI: HITUNG CRC16 CCITT
-    function convertCRC16(str) {
+    // CRC16 Generator
+    function makeCRC(s) {
         let crc = 0xFFFF;
-        for (let c = 0; c < str.length; c++) {
-            crc ^= str.charCodeAt(c) << 8;
-            for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < s.length; i++) {
+            crc ^= s.charCodeAt(i) << 8;
+            for (let j = 0; j < 8; j++) {
                 if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
-                else crc = crc << 1;
+                else crc = (crc << 1);
             }
         }
-        crc &= 0xFFFF;
-        return crc.toString(16).toUpperCase().padStart(4, '0');
+        return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
 
-    // FUNGSI SUNTIK NOMINAL
-    function makeDynamic(qris, nominal) {
-        let q = qris.slice(0, -4); // Buang CRC lama
-        let n = nominal.toString();
-        let tag54 = "54" + n.length.toString().padStart(2, '0') + n;
+    // Dynamic Engine
+    function generateQR(n) {
+        let base = rawQRIS.slice(0, -4);
+        let tag54 = "54" + n.toString().length.toString().padStart(2, '0') + n;
+        let newQR = base.replace("5802ID", tag54 + "5802ID") + makeCRC(base.replace("5802ID", tag54 + "5802ID"));
         
-        // Cek kalo udah ada tag 54, kita ganti. Kalo belum, selipin sebelum tag 58
-        if (q.includes("540")) {
-            q = q.replace(/54\d{2}\d+/, tag54);
-        } else {
-            q = q.replace("5802ID", tag54 + "5802ID");
-        }
-        
-        return q + convertCRC16(q);
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+            text: newQR,
+            width: 220,
+            height: 220,
+            correctLevel: QRCode.CorrectLevel.M
+        });
     }
 
-    // RENDER LIST
-    const listHtml = paket.map(n => `
-        <div class="bar" onclick="bukaBayar(${n})">
+    // Render Bar
+    document.getElementById('list-item').innerHTML = paket.map(n => `
+        <div class="bar" onclick="bukaModal(${n})">
             <span class="price">Rp ${n.toLocaleString('id-ID')}</span>
-            <span class="ress">${(n/100)} ${(n==5000)?'+ RESS':'+'}</span>
+            <span class="ress">${n/100} RESS</span>
         </div>
     `).join('');
-    document.getElementById('list-target').innerHTML = listHtml;
 
-    function bukaBayar(n) {
+    function bukaModal(n) {
         selectedNominal = n;
-        document.getElementById('pay-total').innerText = "Rp " + n.toLocaleString('id-ID');
-        const dynamicQR = makeDynamic(rawQRIS, n);
-        const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=350x350&chl=${encodeURIComponent(dynamicQR)}`;
-        document.getElementById('qris-image').src = qrUrl;
+        document.getElementById('pay-total').innerText = "Total: Rp " + n.toLocaleString('id-ID');
         document.getElementById('payment-modal').style.display = 'flex';
+        // Kasih jeda dikit biar modal muncul dulu baru QR digambar
+        setTimeout(() => { generateQR(n); }, 200);
     }
 
     function tutupModal() { document.getElementById('payment-modal').style.display = 'none'; }
@@ -107,9 +102,8 @@
         document.getElementById('payment-modal').style.display = 'none';
         document.getElementById('processing-screen').style.display = 'flex';
         setTimeout(() => {
-            const msg = `DONE MIN BUY JASTEB\nNominal: ${selectedNominal}\nEmail: Isi emailmu`;
-            window.location.href = `https://wa.me/${adminWA}?text=${encodeURIComponent(msg)}`;
-        }, 3000);
+            window.location.href = `https://wa.me/${adminWA}?text=${encodeURIComponent("DONE MIN BUY JASTEB\nNominal: " + selectedNominal + "\nEmail: Isi emailmu")}`;
+        }, 2500);
     }
 </script>
 </body>
