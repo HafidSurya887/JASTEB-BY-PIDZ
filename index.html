@@ -15,11 +15,9 @@
         .bar:hover { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; transform: scale(1.02); }
         .price { font-weight: 700; color: #fff; }
         .ress { color: #00ff88; font-weight: 600; font-size: 0.8rem; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 5px; }
-        
         #payment-modal, #processing-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; justify-content: center; align-items: center; flex-direction: column; z-index: 1000; padding: 20px; }
-        .modal-box { background: #fff; padding: 10px; border-radius: 15px; margin-bottom: 20px; width: 280px; height: 280px; display: flex; justify-content: center; align-items: center; }
-        .modal-box img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        
+        .modal-box { background: #fff; padding: 10px; border-radius: 15px; margin-bottom: 20px; width: 280px; height: 280px; overflow: hidden; }
+        .modal-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .loader { border: 4px solid rgba(0, 255, 136, 0.1); border-left-color: #00ff88; width: 50px; height: 50px; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .btn { background: #00ff88; color: #000; border: none; width: 100%; max-width: 250px; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
@@ -30,74 +28,44 @@
 
 <div class="card">
     <h1>JASTEB BY PIDZ</h1>
-    <p class="tagline">AUTOMATIC PAYMENT • FIDZ STORE</p>
-    <div id="list-target"></div>
+    <p class="tagline">JUBEL HASIL RESS • PIDZ STORE</p>
+    <div class="bar" onclick="buka(5000)"> <span class="price">Rp 5.000</span> <span class="ress">50+ RESS</span> </div>
+    <div class="bar" onclick="buka(10000)"> <span class="price">Rp 10.000</span> <span class="ress">100+</span> </div>
+    <div class="bar" onclick="buka(15000)"> <span class="price">Rp 15.000</span> <span class="ress">150+</span> </div>
+    <div class="bar" onclick="buka(20000)"> <span class="price">Rp 20.000</span> <span class="ress">200+</span> </div>
+    <div class="bar" onclick="buka(25000)"> <span class="price">Rp 25.000</span> <span class="ress">250+</span> </div>
 </div>
 
 <div id="payment-modal">
-    <h3 style="margin-bottom: 20px; font-family: 'Orbitron';">PEMBAYARAN QRIS</h3>
+    <h3 style="margin-bottom: 20px; font-family: 'Orbitron';">SILAHKAN SCAN</h3>
     <div class="modal-box">
-        <img id="qris-img" src="" alt="Memuat QRIS...">
+        <img src="bayar.jpg" alt="QRIS">
     </div>
-    <h2 id="pay-total" style="color: #00ff88; margin-bottom: 20px;"></h2>
-    <button class="btn" onclick="prosesKeWA()">KONFIRMASI SELESAI</button>
-    <button class="btn-cancel" onclick="tutupModal()">KEMBALI</button>
+    <p style="color: #888; font-size: 0.8rem;">Total Tagihan:</p>
+    <h2 id="txt-harga" style="color: #00ff88; margin-bottom: 20px;"></h2>
+    <button class="btn" onclick="keWA()">KONFIRMASI SELESAI</button>
+    <button class="btn-cancel" onclick="tutup()">KEMBALI</button>
 </div>
 
 <div id="processing-screen">
     <div class="loader"></div>
-    <h2 style="font-family: 'Orbitron'; color: #00ff88;">MENGKONFIRMASI...</h2>
+    <h2 style="font-family: 'Orbitron'; color: #00ff88;">MEMPROSES...</h2>
 </div>
 
 <script>
-    const rawQRIS = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
-    const adminWA = "6288975532473";
-    const paket = [5000, 10000, 15000, 20000, 25000];
-    let currentN = 0;
-
-    function calcCRC(s) {
-        let crc = 0xFFFF;
-        for (let i = 0; i < s.length; i++) {
-            crc ^= s.charCodeAt(i) << 8;
-            for (let j = 0; j < 8; j++) {
-                if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
-                else crc = (crc << 1);
-            }
-        }
-        return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-    }
-
-    function makeQR(n) {
-        let base = rawQRIS.slice(0, -4);
-        let tag54 = "54" + n.toString().length.toString().padStart(2, '0') + n;
-        let finalStr = base.replace("5802ID", tag54 + "5802ID");
-        finalStr = finalStr + calcCRC(finalStr);
-        // PAKE GOOGLE API (PASTI MUNCUL)
-        return "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" + encodeURIComponent(finalStr);
-    }
-
-    document.getElementById('list-target').innerHTML = paket.map(n => `
-        <div class="bar" onclick="bukaModal(${n})">
-            <span class="price">Rp ${n.toLocaleString('id-ID')}</span>
-            <span class="ress">${n/100} RESS</span>
-        </div>
-    `).join('');
-
-    function bukaModal(n) {
-        currentN = n;
-        document.getElementById('pay-total').innerText = "Rp " + n.toLocaleString('id-ID');
-        document.getElementById('qris-img').src = makeQR(n);
+    let hargaPilih = 0;
+    function buka(n) {
+        hargaPilih = n;
+        document.getElementById('txt-harga').innerText = "Rp " + n.toLocaleString('id-ID');
         document.getElementById('payment-modal').style.display = 'flex';
     }
-
-    function tutupModal() { document.getElementById('payment-modal').style.display = 'none'; }
-
-    function prosesKeWA() {
+    function tutup() { document.getElementById('payment-modal').style.display = 'none'; }
+    function keWA() {
         document.getElementById('payment-modal').style.display = 'none';
         document.getElementById('processing-screen').style.display = 'flex';
         setTimeout(() => {
-            window.location.href = `https://wa.me/${adminWA}?text=${encodeURIComponent("DONE MIN BUY JASTEB\nNominal: " + currentN + "\nEmail: Isi emailmu")}`;
-        }, 2500);
+            window.location.href = "https://wa.me/6288975532473?text=" + encodeURIComponent("DONE MIN BUY JASTEB\nNominal: " + hargaPilih);
+        }, 2000);
     }
 </script>
 </body>
