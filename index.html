@@ -11,37 +11,36 @@
         [data-theme="purple"] { --bg: #1a0a2e; --text: #efccff; --accent: #bc13fe; --card: rgba(255,255,255,0.05); }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.5s; display: flex; justify-content: center; align-items: center; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.5s; display: flex; justify-content: center; align-items: center; padding: 20px 0; }
 
         /* HEADER & THEME */
         .theme-btn { position: fixed; top: 20px; left: 20px; z-index: 3000; background: var(--accent); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
-        header { position: fixed; top: 0; right: 0; padding: 15px 20px; display: none; align-items: center; z-index: 2000; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); cursor: pointer; }
-
-        /* CARDS */
-        #auth-screen, #main-store { width: 90%; max-width: 380px; animation: fadeInUp 0.5s; }
-        #main-store { display: none; }
-        .card { background: var(--card); padding: 30px; border-radius: 30px; border: 1px solid var(--accent); text-align: center; }
-        input { width: 100%; padding: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--accent); border-radius: 10px; color: var(--text); outline: none; }
         
-        .item { background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s; }
-        .item:hover { background: rgba(0,255,136,0.1); transform: scale(1.02); }
+        /* STORE CARD */
+        #main-store { width: 90%; max-width: 380px; animation: fadeInUp 0.5s; }
+        .card { background: var(--card); padding: 30px; border-radius: 30px; border: 1px solid var(--accent); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { font-family: 'Orbitron'; color: var(--accent); margin-bottom: 5px; font-size: 1.4rem; }
+        
+        /* LIST ITEM */
+        .item { background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 18px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .item:hover { border-color: var(--accent); background: rgba(0,255,136,0.1); transform: scale(1.02); }
         .ress { background: var(--accent); color: #000; font-size: 10px; padding: 4px 10px; border-radius: 8px; font-weight: 800; }
 
-        /* COMMUNITY BUTTONS */
+        /* COMMUNITY */
         .comm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .btn-comm { padding: 12px; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 12px; font-family: 'Orbitron'; font-size: 9px; cursor: pointer; transition: 0.3s; }
         .btn-comm:hover { background: var(--accent); color: #000; }
         .branding { margin-top: 25px; font-family: 'Orbitron'; font-size: 9px; opacity: 0.4; letter-spacing: 1px; }
 
         /* HELPER */
-        .helper-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 15px var(--accent); z-index: 5000; transition: 0.3s; border: none; }
+        .helper-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 15px var(--accent); z-index: 5000; border: none; }
         .helper-btn span { color: #000; font-size: 20px; font-weight: 900; }
 
-        /* PAYMENT MODAL */
+        /* MODAL */
         #modal, #proc { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); justify-content: center; align-items: center; flex-direction: column; z-index: 4000; }
         .qr-box { background: #fff; padding: 10px; border-radius: 15px; width: 250px; height: 250px; margin-bottom: 20px; }
         .btn-pro { background: var(--accent); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Orbitron'; }
+        
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -49,27 +48,14 @@
 
     <button class="theme-btn" onclick="gantiTema()">TEMA</button>
 
-    <header id="main-header">
-        <img src="https://api.dicebear.com/8.x/avataaars/svg?seed=Fidz" class="avatar" onclick="logout()">
-    </header>
-
-    <button class="helper-btn" id="helper" style="display:none;" onclick="contactAdmin()">
+    <button class="helper-btn" onclick="contactAdmin()">
         <span>?</span>
     </button>
 
-    <div id="auth-screen" class="card">
-        <h1 id="auth-title">DAFTAR</h1>
-        <input type="text" id="user" placeholder="Nama User">
-        <input type="password" id="pass" placeholder="Password">
-        <div id="conf-box"><input type="password" id="conf" placeholder="Konfirmasi Password"></div>
-        <button class="btn-pro" style="width:100%" onclick="handleAuth()" id="auth-btn">DAFTAR</button>
-        <p style="font-size:10px; margin-top:15px; cursor:pointer" onclick="switchMode()" id="toggle">Sudah punya akun? Login</p>
-    </div>
-
     <div id="main-store">
         <div class="card">
-            <h1 style="font-size: 1.2rem; margin-bottom: 5px;">FIDZ STORE</h1>
-            <p id="greet" style="font-size: 10px; opacity: 0.6; margin-bottom: 25px;"></p>
+            <h1>FIDZ STORE</h1>
+            <p style="font-size: 10px; opacity: 0.6; margin-bottom: 25px;">JASTEB HASIL RESS AKTIF ✅</p>
             
             <div id="list-paket"></div>
 
@@ -97,8 +83,9 @@
     const qris = "00020101021126570011ID.DANA.WWW011893600915392503374602099250337460303UMI51440014ID.CO.QRIS.WWW0215ID10254098107240303UMI5204481453033605802ID5911PIDZ STORED6014Kota Palembang61053011163047403";
     const wa = "6288975532473";
     const paket = [5000, 10000, 15000, 20000, 25000];
-    let isLogin = false, currentH = 0;
+    let currentH = 0;
 
+    // THEME
     const themes = ["dark", "light", "purple"];
     let thIdx = 0;
     function gantiTema() {
@@ -106,49 +93,15 @@
         document.body.setAttribute('data-theme', themes[thIdx]);
     }
 
-    function switchMode() {
-        isLogin = !isLogin;
-        document.getElementById('auth-title').innerText = isLogin ? "LOGIN" : "DAFTAR";
-        document.getElementById('conf-box').style.display = isLogin ? "none" : "block";
-        document.getElementById('toggle').innerText = isLogin ? "Belum punya akun? Daftar" : "Sudah punya akun? Login";
-    }
-
-    function handleAuth() {
-        const u = document.getElementById('user').value, p = document.getElementById('pass').value, c = document.getElementById('conf').value;
-        if(!isLogin) {
-            if(p !== c) return alert("Password tidak cocok!");
-            localStorage.setItem('f_u', u); localStorage.setItem('f_p', p);
-            alert("Berhasil! Silakan Login."); switchMode();
-        } else {
-            if(u === localStorage.getItem('f_u') && p === localStorage.getItem('f_p')) {
-                localStorage.setItem('f_session', u); showStore(u);
-            } else { alert("Data salah!"); }
-        }
-    }
-
-    function showStore(n) {
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('main-header').style.display = 'flex';
-        document.getElementById('main-store').style.display = 'block';
-        document.getElementById('helper').style.display = 'flex';
-        document.getElementById('greet').innerText = "Halo " + n + ", JUBEL HASIL RESS AKTIF";
-        render();
-    }
-
-    // AUTO-LOGIN SESSION
+    // RENDER LIST
     window.onload = () => {
-        const s = localStorage.getItem('f_session');
-        if(s) showStore(s);
-    };
-
-    function render() {
         document.getElementById('list-paket').innerHTML = paket.map(h => `
             <div class="item" onclick="openPay(${h})">
                 <span style="font-weight:700">Rp ${h.toLocaleString('id-ID')}</span>
                 <span class="ress">${h/100} RESS</span>
             </div>
         `).join('');
-    }
+    };
 
     function openPay(n) {
         currentH = n;
@@ -166,10 +119,9 @@
         document.getElementById('modal').style.display = 'flex';
     }
 
-    function contactAdmin() { window.location.href = `https://wa.me/${wa}?text=Min, butuh bantuan di Fidz Store!`; }
+    function contactAdmin() { window.location.href = `https://wa.me/${wa}?text=Min, mau tanya-tanya nih!`; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function logout() { localStorage.removeItem('f_session'); location.reload(); }
-    function kirimWA() { window.location.href = `https://wa.me/${wa}?text=Done Bayar Rp ${currentH}. Proses Min!`; }
+    function kirimWA() { window.location.href = `https://wa.me/${wa}?text=Done Jastab Rp ${currentH}. Cek Min!`; }
 </script>
 </body>
 </html>
