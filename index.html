@@ -10,31 +10,31 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .card { width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center; }
-        h1 { font-family: 'Orbitron', sans-serif; color: #00ff88; text-shadow: 0 0 10px #00ff8866; margin-bottom: 5px; }
+        h1 { font-family: 'Orbitron', sans-serif; color: #00ff88; text-shadow: 0 0 10px #00ff8866; }
         .tagline { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-bottom: 30px; }
         .bar { background: rgba(255, 255, 255, 0.03); margin-bottom: 12px; padding: 15px 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.05); }
         .bar:hover { background: rgba(0, 255, 136, 0.1); border-color: #00ff88; transform: scale(1.02); }
         .price { font-weight: 700; color: #fff; }
         .ress { color: #00ff88; font-weight: 600; font-size: 0.8rem; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 5px; }
         #payment-modal, #processing-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; justify-content: center; align-items: center; flex-direction: column; z-index: 1000; }
-        .modal-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-        #qrcode img { margin: 0 auto; display: block; }
+        .modal-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        #qrcode img { margin: 0 auto; }
+        .btn { background: #00ff88; color: #000; border: none; width: 80%; max-width: 250px; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .btn-cancel { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; }
         .loader { border: 4px solid rgba(0, 255, 136, 0.1); border-left-color: #00ff88; width: 50px; height: 50px; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .btn { background: #00ff88; color: #000; border: none; width: 80%; max-width: 250px; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-cancel { color: #ff4444; margin-top: 20px; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1>JASTEB BY PIDZ</h1>
-    <p class="tagline">JUBEL HASIL RESS • BY FIDZ STORE</p>
+    <p class="tagline">AUTOMATIC PAYMENT • FIDZ STORE</p>
     <div id="list-item"></div>
 </div>
 
 <div id="payment-modal">
-    <h3 style="margin-bottom: 20px; font-family: 'Orbitron'; color: white;">PEMBAYARAN QRIS</h3>
+    <h3 style="margin-bottom: 20px; font-family: 'Orbitron';">SCAN & BAYAR</h3>
     <div class="modal-box"><div id="qrcode"></div></div>
     <h2 id="pay-total" style="color: #00ff88; margin-bottom: 20px;"></h2>
     <button class="btn" onclick="prosesKeWA()">KONFIRMASI SELESAI</button>
@@ -52,8 +52,8 @@
     const paket = [5000, 10000, 15000, 20000, 25000];
     let selectedNominal = 0;
 
-    // CRC16 Generator
-    function makeCRC(s) {
+    // Logic Hitung CRC16
+    function fixCRC(s) {
         let crc = 0xFFFF;
         for (let i = 0; i < s.length; i++) {
             crc ^= s.charCodeAt(i) << 8;
@@ -65,22 +65,20 @@
         return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
 
-    // Dynamic Engine
-    function generateQR(n) {
-        let base = rawQRIS.slice(0, -4);
+    function generateDynamic(n) {
+        let q = rawQRIS.slice(0, -4);
         let tag54 = "54" + n.toString().length.toString().padStart(2, '0') + n;
-        let newQR = base.replace("5802ID", tag54 + "5802ID") + makeCRC(base.replace("5802ID", tag54 + "5802ID"));
+        let finalQR = q.replace("5802ID", tag54 + "5802ID");
+        finalQR = finalQR + fixCRC(finalQR);
         
         document.getElementById('qrcode').innerHTML = "";
         new QRCode(document.getElementById("qrcode"), {
-            text: newQR,
+            text: finalQR,
             width: 220,
-            height: 220,
-            correctLevel: QRCode.CorrectLevel.M
+            height: 220
         });
     }
 
-    // Render Bar
     document.getElementById('list-item').innerHTML = paket.map(n => `
         <div class="bar" onclick="bukaModal(${n})">
             <span class="price">Rp ${n.toLocaleString('id-ID')}</span>
@@ -90,10 +88,10 @@
 
     function bukaModal(n) {
         selectedNominal = n;
-        document.getElementById('pay-total').innerText = "Total: Rp " + n.toLocaleString('id-ID');
+        document.getElementById('pay-total').innerText = "Rp " + n.toLocaleString('id-ID');
         document.getElementById('payment-modal').style.display = 'flex';
-        // Kasih jeda dikit biar modal muncul dulu baru QR digambar
-        setTimeout(() => { generateQR(n); }, 200);
+        // Kasih jeda 300ms biar modal muncul sempurna dulu baru QR digambar
+        setTimeout(() => { generateDynamic(n); }, 300);
     }
 
     function tutupModal() { document.getElementById('payment-modal').style.display = 'none'; }
